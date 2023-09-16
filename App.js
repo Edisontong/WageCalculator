@@ -3,6 +3,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import HomeScreen from "./HomeScreen";
 import HistoryScreen from "./HistoryScreen";
+import WageCalculatorScreen from "./WageCalculatorScreen";
 
 const Stack = createStackNavigator();
 
@@ -12,6 +13,7 @@ export default function App() {
       <Stack.Navigator initialRouteName="Home">
         <Stack.Screen name="Home" component={HomeScreen} />
         <Stack.Screen name="History" component={HistoryScreen} />
+        <Stack.Screen name="WageCalculator" component={WageCalculatorScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
