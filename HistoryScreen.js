@@ -14,7 +14,7 @@ export default function HistoryScreen() {
         data={timePunches}
         renderItem={({ item }) => (
           <View style={styles.timePunch}>
-            <Text>Date: {item.date}</Text>
+            <Text style={styles.date}>{getFormattedDate(item.date)}</Text>
             <Text>Start Time: {item.clockInTime}</Text>
             <Text>End Time: {item.clockOutTime}</Text>
           </View>
@@ -41,4 +41,14 @@ const styles = StyleSheet.create({
     backgroundColor: "#f0f0f0",
     borderRadius: 8,
   },
+  date: {
+    fontSize: 18,
+    fontWeight: "bold",
+  },
 });
+
+const getFormattedDate = (dateString) => {
+  const options = { weekday: "long", year: "numeric", month: "long", day: "numeric" };
+  const date = new Date(dateString);
+  return date.toLocaleDateString(undefined, options);
+};
