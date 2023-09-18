@@ -1,10 +1,28 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, Button, StyleSheet } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function HomeScreen({ navigation }) {
   const [clockedIn, setClockedIn] = useState(false);
 
+  useEffect(() => {
+    // Load the clockedIn state from AsyncStorage when the component mounts
+    loadClockedInState();
+  }, []);
+
+  // Function to load clockedIn state from AsyncStorage
+  const loadClockedInState = async () => {
+    try {
+      const storedClockedIn = await AsyncStorage.getItem("clockedIn");
+      if (storedClockedIn !== null) {
+        setClockedIn(storedClockedIn === "true");
+      }
+    } catch (error) {
+      console.error("Error loading clockedIn state:", error);
+    }
+  };
+
+  // Function to handle clock in/out
   const handleClockInOut = async () => {
     const currentTime = new Date();
     let timePunches = [];
@@ -28,17 +46,22 @@ export default function HomeScreen({ navigation }) {
           date: currentTime.toISOString(),
           clockInTime: currentTime.toISOString(),
           clockOutTime: "",
+          tags: ["unpaid"], // Add the "unpaid" tag when clocking in
         };
         timePunches.push(newTimePunch);
       }
 
+      console.log(timePunches);
+
       // Save updated time punches to AsyncStorage
       await AsyncStorage.setItem("timePunches", JSON.stringify(timePunches));
 
-      // Update the clockedIn state
-      setClockedIn(!clockedIn);
+      // Toggle clockedIn state and save it to AsyncStorage
+      const updatedClockedIn = !clockedIn;
+      await AsyncStorage.setItem("clockedIn", updatedClockedIn.toString());
+      setClockedIn(updatedClockedIn);
     } catch (error) {
-      console.error("Error saving time punch:", error);
+      console.error("Error saving time punch or clockedIn state:", error);
     }
   };
 
@@ -59,3 +82,4 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
 });
+``;
