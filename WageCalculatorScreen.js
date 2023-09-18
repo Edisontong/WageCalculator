@@ -3,9 +3,9 @@ import { View, Text, TextInput, Button, StyleSheet } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function WageCalculatorScreen() {
-  const [hourlyRate, setHourlyRate] = useState(""); // State to store hourly rate
-  const [selectedDays, setSelectedDays] = useState([]); // State to store selected days
-  const [totalEarnings, setTotalEarnings] = useState(""); // State to store total earnings
+  const [hourlyRate, setHourlyRate] = useState("");
+  const [totalEarnings, setTotalEarnings] = useState("");
+  const [isEditingRate, setIsEditingRate] = useState(false);
 
   useEffect(() => {
     // Load the hourly rate from AsyncStorage when the component mounts
@@ -28,10 +28,21 @@ export default function WageCalculatorScreen() {
   const saveHourlyRate = async () => {
     try {
       await AsyncStorage.setItem("hourlyRate", hourlyRate);
+      setIsEditingRate(false); // Exit rate editing mode
       alert("Hourly rate saved successfully.");
     } catch (error) {
       console.error("Error saving hourly rate:", error);
     }
+  };
+
+  // Function to handle rate input changes
+  const handleRateInputChange = (text) => {
+    setHourlyRate(text);
+  };
+
+  // Function to handle rate input submission (e.g., Enter key)
+  const handleRateInputSubmit = () => {
+    saveHourlyRate();
   };
 
   // Function to calculate total earnings
@@ -46,14 +57,21 @@ export default function WageCalculatorScreen() {
   return (
     <View style={styles.container}>
       <Text style={styles.header}>Wage Calculator</Text>
-      <Text>Hourly Rate:</Text>
-      <TextInput
-        style={styles.input}
-        onChangeText={(text) => setHourlyRate(text)}
-        value={hourlyRate}
-        keyboardType="numeric"
-      />
-      <Button title="Save Hourly Rate" onPress={saveHourlyRate} />
+      {isEditingRate ? (
+        <TextInput
+          style={styles.input}
+          onChangeText={handleRateInputChange}
+          value={hourlyRate}
+          keyboardType="numeric"
+          returnKeyType="done" // Add "Done" button to the numeric keyboard
+          onSubmitEditing={handleRateInputSubmit}
+        />
+      ) : (
+        <>
+          <Text>Hourly Rate: ${hourlyRate}</Text>
+          <Button title="Set Hourly Rate" onPress={() => setIsEditingRate(true)} />
+        </>
+      )}
       {/* Add UI elements to select days */}
       <Button title="Calculate Earnings" onPress={calculateTotalEarnings} />
       <Text>Total Earnings: {totalEarnings}</Text>
