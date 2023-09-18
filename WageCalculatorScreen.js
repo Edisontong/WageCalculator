@@ -1,15 +1,19 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TextInput, Button, StyleSheet } from "react-native";
+import { View, Text, TextInput, Button, StyleSheet, FlatList } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function WageCalculatorScreen() {
   const [hourlyRate, setHourlyRate] = useState("");
   const [totalEarnings, setTotalEarnings] = useState("");
   const [isEditingRate, setIsEditingRate] = useState(false);
+  const [timePunches, setTimePunches] = useState([]);
 
   useEffect(() => {
     // Load the hourly rate from AsyncStorage when the component mounts
     loadHourlyRate();
+
+    // Load time punches from AsyncStorage
+    loadTimePunches();
   }, []);
 
   // Function to load hourly rate from AsyncStorage
@@ -21,6 +25,19 @@ export default function WageCalculatorScreen() {
       }
     } catch (error) {
       console.error("Error loading hourly rate:", error);
+    }
+  };
+
+  // Function to load time punches from AsyncStorage
+  const loadTimePunches = async () => {
+    try {
+      const savedTimePunches = await AsyncStorage.getItem("timePunches");
+      if (savedTimePunches) {
+        const parsedTimePunches = JSON.parse(savedTimePunches);
+        setTimePunches(parsedTimePunches);
+      }
+    } catch (error) {
+      console.error("Error loading time punches:", error);
     }
   };
 
@@ -63,7 +80,7 @@ export default function WageCalculatorScreen() {
           onChangeText={handleRateInputChange}
           value={hourlyRate}
           keyboardType="numeric"
-          returnKeyType="done" // Add "Done" button to the numeric keyboard
+          returnKeyType="done"
           onSubmitEditing={handleRateInputSubmit}
         />
       ) : (
@@ -72,8 +89,22 @@ export default function WageCalculatorScreen() {
           <Button title="Set Hourly Rate" onPress={() => setIsEditingRate(true)} />
         </>
       )}
+      {/* Display individual time punches */}
+      <FlatList
+        data={timePunches.filter((item) => item.tags && item.tags.includes("unpaid"))}
+        renderItem={({ item }) => (
+          <View style={styles.timePunch}>
+            <Text>Date: {item.date}</Text>
+            <Text>Start Time: {item.clockInTime}</Text>
+            <Text>End Time: {item.clockOutTime}</Text>
+            {item.tags && item.tags.includes("unpaid") ? <Text>Tags: Unpaid</Text> : null}
+          </View>
+        )}
+        keyExtractor={(item, index) => index.toString()}
+      />
       {/* Add UI elements to select days */}
       <Button title="Calculate Earnings" onPress={calculateTotalEarnings} />
+      {/* Move the "Total Earnings" text above the "Calculate Earnings" button */}
       <Text>Total Earnings: {totalEarnings}</Text>
     </View>
   );
@@ -94,5 +125,11 @@ const styles = StyleSheet.create({
     borderColor: "#ccc",
     padding: 8,
     marginBottom: 16,
+  },
+  timePunch: {
+    marginBottom: 16,
+    padding: 8,
+    backgroundColor: "#f0f0f0",
+    borderRadius: 8,
   },
 });
