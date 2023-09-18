@@ -1,11 +1,26 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, FlatList, StyleSheet } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function HistoryScreen() {
-  const timePunches = [
-    { date: "2023-09-01", clockInTime: "09:00 AM", clockOutTime: "05:00 PM" },
-    { date: "2023-09-02", clockInTime: "09:15 AM", clockOutTime: "04:45 PM" },
-  ];
+  const [timePunches, setTimePunches] = useState([]);
+
+  useEffect(() => {
+    // Load the saved time punches from AsyncStorage when the component mounts
+    loadTimePunches();
+  }, []);
+
+  // Function to load saved time punches from AsyncStorage
+  const loadTimePunches = async () => {
+    try {
+      const savedTimePunches = await AsyncStorage.getItem("timePunches");
+      if (savedTimePunches) {
+        setTimePunches(JSON.parse(savedTimePunches));
+      }
+    } catch (error) {
+      console.error("Error loading time punches:", error);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -15,8 +30,8 @@ export default function HistoryScreen() {
         renderItem={({ item }) => (
           <View style={styles.timePunch}>
             <Text style={styles.date}>{getFormattedDate(item.date)}</Text>
-            <Text>Start Time: {item.clockInTime}</Text>
-            <Text>End Time: {item.clockOutTime}</Text>
+            <Text>Start Time: {getFormattedTime(item.clockInTime)}</Text>
+            {item.clockOutTime && <Text>End Time: {getFormattedTime(item.clockOutTime)}</Text>}
           </View>
         )}
         keyExtractor={(item, index) => index.toString()}
@@ -51,4 +66,9 @@ const getFormattedDate = (dateString) => {
   const options = { weekday: "long", year: "numeric", month: "long", day: "numeric" };
   const date = new Date(dateString);
   return date.toLocaleDateString(undefined, options);
+};
+
+const getFormattedTime = (timeString) => {
+  const date = new Date(timeString);
+  return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 };
