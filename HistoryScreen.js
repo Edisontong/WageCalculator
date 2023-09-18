@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, FlatList, StyleSheet } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import TimePunch from "./TimePunch";
 
 export default function HistoryScreen() {
   const [timePunches, setTimePunches] = useState([]);
@@ -27,13 +28,7 @@ export default function HistoryScreen() {
       <Text style={styles.header}>History</Text>
       <FlatList
         data={timePunches}
-        renderItem={({ item }) => (
-          <View style={styles.timePunch}>
-            <Text style={styles.date}>{getFormattedDate(item.date)}</Text>
-            <Text>Start Time: {getFormattedTime(item.clockInTime)}</Text>
-            {item.clockOutTime && <Text>End Time: {getFormattedTime(item.clockOutTime)}</Text>}
-          </View>
-        )}
+        renderItem={({ item }) => <TimePunch item={item} />}
         keyExtractor={(item, index) => index.toString()}
       />
     </View>

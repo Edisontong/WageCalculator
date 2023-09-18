@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, TextInput, Button, StyleSheet, FlatList } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import TimePunch from "./TimePunch";
 
 export default function WageCalculatorScreen() {
   const [hourlyRate, setHourlyRate] = useState("");
@@ -92,14 +93,7 @@ export default function WageCalculatorScreen() {
       {/* Display individual time punches */}
       <FlatList
         data={timePunches.filter((item) => item.tags && item.tags.includes("unpaid"))}
-        renderItem={({ item }) => (
-          <View style={styles.timePunch}>
-            <Text>Date: {item.date}</Text>
-            <Text>Start Time: {item.clockInTime}</Text>
-            <Text>End Time: {item.clockOutTime}</Text>
-            {item.tags && item.tags.includes("unpaid") ? <Text>Tags: Unpaid</Text> : null}
-          </View>
-        )}
+        renderItem={({ item }) => <TimePunch item={item} />} // Use the TimePunch component
         keyExtractor={(item, index) => index.toString()}
       />
       {/* Add UI elements to select days */}
