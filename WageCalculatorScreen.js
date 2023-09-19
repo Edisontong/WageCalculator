@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { View, Text, TextInput, Button, StyleSheet, FlatList } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import TimePunch from "./TimePunch";
+import EarningsModal from "./EarningsModal";
 
 export default function WageCalculatorScreen() {
   const [hourlyRate, setHourlyRate] = useState("");
@@ -9,6 +10,8 @@ export default function WageCalculatorScreen() {
   const [isEditingRate, setIsEditingRate] = useState(false);
   const [timePunches, setTimePunches] = useState([]);
   const [selectedTimePunches, setSelectedTimePunches] = useState([]);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [modalStep, setModalStep] = useState(0);
 
   useEffect(() => {
     // Load the hourly rate from AsyncStorage when the component mounts
@@ -78,6 +81,13 @@ export default function WageCalculatorScreen() {
     }
   };
 
+  const openModal = () => {
+    // Perform calculations and update the state with the data to be displayed in the modal
+
+    setIsModalVisible(true);
+    setModalStep(1);
+  };
+
   // Function to calculate total earnings
   const calculateTotalEarnings = () => {
     // Implement the logic to calculate earnings here
@@ -118,10 +128,9 @@ export default function WageCalculatorScreen() {
         )}
         keyExtractor={(item, index) => index.toString()}
       />
-      {/* Add UI elements to select days */}
-      <Button title="Calculate Earnings" onPress={calculateTotalEarnings} />
-      {/* Move the "Total Earnings" text above the "Calculate Earnings" button */}
-      <Text>Total Earnings: {totalEarnings}</Text>
+
+      <Button title="Calculate Earnings" onPress={openModal} />
+      <EarningsModal isVisible={isModalVisible} closeModal={() => setIsModalVisible(false)} />
     </View>
   );
 }
