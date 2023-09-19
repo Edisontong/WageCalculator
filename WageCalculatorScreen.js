@@ -113,6 +113,7 @@ export default function WageCalculatorScreen() {
             item={item}
             onSelect={toggleTimePunchSelection}
             isSelected={selectedTimePunches.some((selectedItem) => selectedItem.date === item.date)}
+            isWageCalculatorScreen={true} // Pass this prop
           />
         )}
         keyExtractor={(item, index) => index.toString()}

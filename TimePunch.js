@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 
-const TimePunch = ({ item, onSelect }) => {
-  const [isChecked, setIsChecked] = useState(false);
+const TimePunch = ({ item, onSelect, isSelected, isWageCalculatorScreen }) => {
+  const [isChecked, setIsChecked] = useState(isSelected);
 
   const toggleCheckbox = () => {
     setIsChecked(!isChecked);
@@ -11,17 +11,19 @@ const TimePunch = ({ item, onSelect }) => {
   };
 
   return (
-    <TouchableOpacity onPress={toggleCheckbox}>
+    <TouchableOpacity onPress={isWageCalculatorScreen ? toggleCheckbox : null}>
       <View style={styles.timePunch}>
         <View style={styles.timePunchDetails}>
           <Text style={styles.date}>{getFormattedDate(item.date)}</Text>
           <Text>Start Time: {getFormattedTime(item.clockInTime)}</Text>
           {item.clockOutTime && <Text>End Time: {getFormattedTime(item.clockOutTime)}</Text>}
         </View>
-        <View style={styles.checkboxContainer}>
-          {isChecked && <MaterialIcons name="check-box" size={24} color="#007bff" />}
-          {!isChecked && <MaterialIcons name="check-box-outline-blank" size={24} color="#007bff" />}
-        </View>
+        {isWageCalculatorScreen && ( // Conditionally render the checkboxes
+          <View style={styles.checkboxContainer}>
+            {isChecked && <MaterialIcons name="check-box" size={24} color="#007bff" />}
+            {!isChecked && <MaterialIcons name="check-box-outline-blank" size={24} color="#007bff" />}
+          </View>
+        )}
       </View>
     </TouchableOpacity>
   );
