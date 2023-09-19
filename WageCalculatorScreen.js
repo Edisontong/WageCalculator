@@ -8,6 +8,7 @@ export default function WageCalculatorScreen() {
   const [totalEarnings, setTotalEarnings] = useState("");
   const [isEditingRate, setIsEditingRate] = useState(false);
   const [timePunches, setTimePunches] = useState([]);
+  const [selectedTimePunches, setSelectedTimePunches] = useState([]);
 
   useEffect(() => {
     // Load the hourly rate from AsyncStorage when the component mounts
@@ -63,6 +64,20 @@ export default function WageCalculatorScreen() {
     saveHourlyRate();
   };
 
+  // Function to toggle selection of a TimePunch entry
+  const toggleTimePunchSelection = (item) => {
+    const selectedIndex = selectedTimePunches.findIndex((selectedItem) => selectedItem.date === item.date);
+    if (selectedIndex === -1) {
+      // If not selected, add to the selected list
+      setSelectedTimePunches([...selectedTimePunches, item]);
+    } else {
+      // If already selected, remove from the selected list
+      const updatedSelection = [...selectedTimePunches];
+      updatedSelection.splice(selectedIndex, 1);
+      setSelectedTimePunches(updatedSelection);
+    }
+  };
+
   // Function to calculate total earnings
   const calculateTotalEarnings = () => {
     // Implement the logic to calculate earnings here
@@ -93,7 +108,13 @@ export default function WageCalculatorScreen() {
       {/* Display individual time punches */}
       <FlatList
         data={timePunches.filter((item) => item.tags && item.tags.includes("unpaid"))}
-        renderItem={({ item }) => <TimePunch item={item} />} // Use the TimePunch component
+        renderItem={({ item }) => (
+          <TimePunch
+            item={item}
+            onSelect={toggleTimePunchSelection}
+            isSelected={selectedTimePunches.some((selectedItem) => selectedItem.date === item.date)}
+          />
+        )}
         keyExtractor={(item, index) => index.toString()}
       />
       {/* Add UI elements to select days */}

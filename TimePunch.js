@@ -1,20 +1,46 @@
-import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import React, { useState } from "react";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { MaterialIcons } from "@expo/vector-icons";
 
-const TimePunch = ({ item }) => (
-  <View style={styles.timePunch}>
-    <Text style={styles.date}>{getFormattedDate(item.date)}</Text>
-    <Text>Start Time: {getFormattedTime(item.clockInTime)}</Text>
-    {item.clockOutTime && <Text>End Time: {getFormattedTime(item.clockOutTime)}</Text>}
-  </View>
-);
+const TimePunch = ({ item, onSelect }) => {
+  const [isChecked, setIsChecked] = useState(false);
+
+  const toggleCheckbox = () => {
+    setIsChecked(!isChecked);
+    onSelect(item, !isChecked); // Pass the selected item and the new checked state to the parent
+  };
+
+  return (
+    <TouchableOpacity onPress={toggleCheckbox}>
+      <View style={styles.timePunch}>
+        <View style={styles.timePunchDetails}>
+          <Text style={styles.date}>{getFormattedDate(item.date)}</Text>
+          <Text>Start Time: {getFormattedTime(item.clockInTime)}</Text>
+          {item.clockOutTime && <Text>End Time: {getFormattedTime(item.clockOutTime)}</Text>}
+        </View>
+        <View style={styles.checkboxContainer}>
+          {isChecked && <MaterialIcons name="check-box" size={24} color="#007bff" />}
+          {!isChecked && <MaterialIcons name="check-box-outline-blank" size={24} color="#007bff" />}
+        </View>
+      </View>
+    </TouchableOpacity>
+  );
+};
 
 const styles = StyleSheet.create({
   timePunch: {
+    flexDirection: "row", // Align the checkbox and details horizontally
+    alignItems: "center", // Center vertically
     marginBottom: 16,
     padding: 8,
     backgroundColor: "#f0f0f0",
     borderRadius: 8,
+  },
+  checkboxContainer: {
+    marginRight: 10, // Add some spacing between the checkbox and details
+  },
+  timePunchDetails: {
+    flex: 1, // Take remaining horizontal space
   },
   date: {
     fontSize: 18,
