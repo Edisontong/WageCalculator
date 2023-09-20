@@ -150,13 +150,10 @@ export default function WageCalculatorScreen() {
           updatedTimePunches[index].tags = ["paid"];
         }
       });
-
-      console.log("Updated Time Punches:", updatedTimePunches); // Add this line for debugging
-
-      await AsyncStorage.setItem("timePunches", JSON.stringify(updatedTimePunches));
-
       // Update the state with the new time punches
       setTimePunches(updatedTimePunches);
+      // Save the updated time punches to AsyncStorage
+      await AsyncStorage.setItem("timePunches", JSON.stringify(updatedTimePunches));
       // Clear the selected time punches
       setSelectedTimePunches([]);
       alert("Time punches marked as paid successfully.");
