@@ -1,7 +1,15 @@
 import React from "react";
 import { View, Text, Modal, Button, StyleSheet } from "react-native";
 
-const EarningsModal = ({ isVisible, closeModal, dateRange }) => {
+const formatElapsedTime = (milliseconds) => {
+  const seconds = Math.floor(milliseconds / 1000);
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(minutes / 60);
+
+  return `${hours} hours, ${minutes % 60} minutes`;
+};
+
+const EarningsModal = ({ isVisible, closeModal, dateRange, totalElapsedTime }) => {
   return (
     <Modal transparent={true} visible={isVisible} animationType="slide">
       <View style={styles.modalBackground}>
@@ -12,6 +20,7 @@ const EarningsModal = ({ isVisible, closeModal, dateRange }) => {
           <View style={styles.modalContent}>
             <Text>Modal Content</Text>
             <Text>{dateRange}</Text>
+            <Text>Total Elapsed Time: {formatElapsedTime(totalElapsedTime)}</Text>
 
             {/* Add your modal content here */}
           </View>

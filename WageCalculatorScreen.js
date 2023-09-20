@@ -12,6 +12,7 @@ export default function WageCalculatorScreen() {
   const [selectedTimePunches, setSelectedTimePunches] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [modalStep, setModalStep] = useState(0);
+  const [totalElapsedTime, setTotalElapsedTime] = useState(0);
 
   useEffect(() => {
     // Load the hourly rate from AsyncStorage when the component mounts
@@ -99,13 +100,32 @@ export default function WageCalculatorScreen() {
     return `Selected Date Range: ${startDate} to ${endDate}`;
   };
 
+  // Function to calculate the total elapsed time
+  const calculateTotalElapsedTime = () => {
+    let totalElapsedTime = 0;
+
+    // Loop through the selected time punches
+    selectedTimePunches.forEach((timePunch) => {
+      if (timePunch.clockInTime && timePunch.clockOutTime) {
+        const startTime = new Date(timePunch.clockInTime).getTime();
+        const endTime = new Date(timePunch.clockOutTime).getTime();
+        const elapsedTime = endTime - startTime;
+        totalElapsedTime += elapsedTime;
+      }
+    });
+
+    return totalElapsedTime;
+  };
+
   const openModal = () => {
     // Calculate the date range
     const dateRange = calculateDateRange();
+    const totalElapsedTime = calculateTotalElapsedTime();
 
     // Perform other calculations as needed
     // For now, we'll only calculate the date range
 
+    setTotalElapsedTime(totalElapsedTime);
     setIsModalVisible(true);
     setModalStep(1);
   };
@@ -155,6 +175,7 @@ export default function WageCalculatorScreen() {
       <EarningsModal
         isVisible={isModalVisible}
         dateRange={calculateDateRange()}
+        totalElapsedTime={totalElapsedTime} // Pass the total elapsed time to the modal
         closeModal={() => setIsModalVisible(false)}
       />
     </View>
