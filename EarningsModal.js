@@ -9,7 +9,7 @@ const formatElapsedTime = (milliseconds) => {
   return `${hours} hours, ${minutes % 60} minutes`;
 };
 
-const EarningsModal = ({ isVisible, closeModal, dateRange, totalElapsedTime }) => {
+const EarningsModal = ({ isVisible, closeModal, dateRange, totalElapsedTime, totalEarnings }) => {
   return (
     <Modal transparent={true} visible={isVisible} animationType="slide">
       <View style={styles.modalBackground}>
@@ -21,7 +21,7 @@ const EarningsModal = ({ isVisible, closeModal, dateRange, totalElapsedTime }) =
             <Text>Modal Content</Text>
             <Text>{dateRange}</Text>
             <Text>Total Elapsed Time: {formatElapsedTime(totalElapsedTime)}</Text>
-
+            <Text>{totalEarnings}</Text>
             {/* Add your modal content here */}
           </View>
           <Button title="Mark as paid" />

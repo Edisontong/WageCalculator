@@ -20,7 +20,9 @@ export default function WageCalculatorScreen() {
 
     // Load time punches from AsyncStorage
     loadTimePunches();
-  }, []);
+
+    calculateTotalEarnings();
+  }, [totalElapsedTime, hourlyRate]);
 
   // Function to load hourly rate from AsyncStorage
   const loadHourlyRate = async () => {
@@ -117,6 +119,17 @@ export default function WageCalculatorScreen() {
     return totalElapsedTime;
   };
 
+  // Function to calculate total earnings
+  const calculateTotalEarnings = () => {
+    if (!hourlyRate) {
+      setTotalEarnings("Hourly rate not set");
+    } else {
+      const totalHoursWorked = totalElapsedTime / (60 * 60 * 1000); // Convert milliseconds to hours
+      const earnings = totalHoursWorked * parseFloat(hourlyRate);
+      setTotalEarnings(`Total Earnings: $${earnings.toFixed(2)}`);
+    }
+  };
+
   const openModal = () => {
     // Calculate the date range
     const dateRange = calculateDateRange();
@@ -124,19 +137,11 @@ export default function WageCalculatorScreen() {
 
     // Perform other calculations as needed
     // For now, we'll only calculate the date range
+    calculateTotalEarnings();
 
     setTotalElapsedTime(totalElapsedTime);
     setIsModalVisible(true);
     setModalStep(1);
-  };
-
-  // Function to calculate total earnings
-  const calculateTotalEarnings = () => {
-    // Implement the logic to calculate earnings here
-    // You can use hourlyRate and selectedDays state to perform calculations
-    // Update the total earnings in state
-    // For now, let's simply set a placeholder value
-    setTotalEarnings("Calculating..."); // Replace this with your calculation logic
   };
 
   return (
@@ -176,6 +181,7 @@ export default function WageCalculatorScreen() {
         isVisible={isModalVisible}
         dateRange={calculateDateRange()}
         totalElapsedTime={totalElapsedTime} // Pass the total elapsed time to the modal
+        totalEarnings={totalEarnings} // Pass the total earnings to the modal
         closeModal={() => setIsModalVisible(false)}
       />
     </View>
