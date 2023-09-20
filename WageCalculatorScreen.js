@@ -130,6 +130,28 @@ export default function WageCalculatorScreen() {
     }
   };
 
+  const markTimePunchesAsPaid = async () => {
+    try {
+      const updatedTimePunches = [...timePunches]; // Create a copy of time punches
+      selectedTimePunches.forEach((selectedItem) => {
+        const index = updatedTimePunches.findIndex((item) => item.date === selectedItem.date);
+        if (index !== -1) {
+          // Update the tags to "paid"
+          updatedTimePunches[index].tags = ["paid"];
+        }
+      });
+      // Update the state with the new time punches
+      setTimePunches(updatedTimePunches);
+      // Save the updated time punches to AsyncStorage
+      await AsyncStorage.setItem("timePunches", JSON.stringify(updatedTimePunches));
+      // Clear the selected time punches
+      setSelectedTimePunches([]);
+      alert("Time punches marked as paid successfully.");
+    } catch (error) {
+      console.error("Error marking time punches as paid:", error);
+    }
+  };
+
   const openModal = () => {
     // Calculate the date range
     const dateRange = calculateDateRange();
@@ -183,6 +205,7 @@ export default function WageCalculatorScreen() {
         totalElapsedTime={totalElapsedTime} // Pass the total elapsed time to the modal
         totalEarnings={totalEarnings} // Pass the total earnings to the modal
         closeModal={() => setIsModalVisible(false)}
+        markTimePunchesAsPaid={markTimePunchesAsPaid}
       />
     </View>
   );
