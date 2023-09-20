@@ -72,38 +72,48 @@ export default function WageCalculatorScreen() {
 
   // Function to toggle selection of a TimePunch entry
   const toggleTimePunchSelection = (item) => {
-    const selectedIndex = selectedTimePunches.findIndex((selectedItem) => selectedItem.date === item.date);
+    // Create a copy of the selected time punches array
+    const updatedSelection = selectedTimePunches ? [...selectedTimePunches] : [];
+
+    const selectedIndex = updatedSelection.findIndex((selectedItem) => selectedItem.date === item.date);
+
     if (selectedIndex === -1) {
       // If not selected, add to the selected list
-      setSelectedTimePunches([...selectedTimePunches, item]);
+      updatedSelection.push(item);
     } else {
       // If already selected, remove from the selected list
-      const updatedSelection = [...selectedTimePunches];
       updatedSelection.splice(selectedIndex, 1);
-      setSelectedTimePunches(updatedSelection);
+    }
+
+    // Update the selected time punches
+    setSelectedTimePunches(updatedSelection);
+  };
+
+  // Function to calculate the date range based on selected time punches
+  const calculateDateRange = (selectedTimePunches) => {
+    try {
+      if (!selectedTimePunches || selectedTimePunches.length === 0) {
+        return "No dates selected";
+      }
+
+      // Find the minimum and maximum dates among the selected time punches
+      const dates = selectedTimePunches.map((timePunch) => new Date(timePunch.date));
+      const minDate = new Date(Math.min(...dates));
+      const maxDate = new Date(Math.max(...dates));
+
+      // Format the dates as strings
+      const startDate = minDate.toLocaleDateString();
+      const endDate = maxDate.toLocaleDateString();
+
+      return `Selected Date Range: ${startDate} to ${endDate}`;
+    } catch (error) {
+      console.error("Error in calculateDateRange:", error);
+      return "Error calculating date range";
     }
   };
 
-  // Function to calculate the date range
-  const calculateDateRange = () => {
-    if (selectedTimePunches.length === 0) {
-      return "No dates selected";
-    }
-
-    // Find the minimum and maximum dates among the selected time punches
-    const dates = selectedTimePunches.map((timePunch) => new Date(timePunch.date));
-    const minDate = new Date(Math.min(...dates));
-    const maxDate = new Date(Math.max(...dates));
-
-    // Format the dates as strings
-    const startDate = minDate.toLocaleDateString();
-    const endDate = maxDate.toLocaleDateString();
-
-    return `Selected Date Range: ${startDate} to ${endDate}`;
-  };
-
-  // Function to calculate the total elapsed time
-  const calculateTotalElapsedTime = () => {
+  // Function to calculate the total elapsed time based on selected time punches
+  const calculateTotalElapsedTime = (selectedTimePunches) => {
     let totalElapsedTime = 0;
 
     // Loop through the selected time punches
@@ -154,11 +164,9 @@ export default function WageCalculatorScreen() {
 
   const openModal = () => {
     // Calculate the date range
-    const dateRange = calculateDateRange();
-    const totalElapsedTime = calculateTotalElapsedTime();
+    const dateRange = calculateDateRange(selectedTimePunches); // Pass selectedTimePunches here
+    const totalElapsedTime = calculateTotalElapsedTime(selectedTimePunches);
 
-    // Perform other calculations as needed
-    // For now, we'll only calculate the date range
     calculateTotalEarnings();
 
     setTotalElapsedTime(totalElapsedTime);
