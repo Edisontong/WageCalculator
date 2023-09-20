@@ -13,6 +13,7 @@ const EarningsModal = ({ isVisible, closeModal }) => {
             <Text>Modal Content</Text>
             {/* Add your modal content here */}
           </View>
+          <Button title="Mark as paid" />
         </View>
       </View>
     </Modal>
