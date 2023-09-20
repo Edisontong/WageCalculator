@@ -81,8 +81,30 @@ export default function WageCalculatorScreen() {
     }
   };
 
+  // Function to calculate the date range
+  const calculateDateRange = () => {
+    if (selectedTimePunches.length === 0) {
+      return "No dates selected";
+    }
+
+    // Find the minimum and maximum dates among the selected time punches
+    const dates = selectedTimePunches.map((timePunch) => new Date(timePunch.date));
+    const minDate = new Date(Math.min(...dates));
+    const maxDate = new Date(Math.max(...dates));
+
+    // Format the dates as strings
+    const startDate = minDate.toLocaleDateString();
+    const endDate = maxDate.toLocaleDateString();
+
+    return `Selected Date Range: ${startDate} to ${endDate}`;
+  };
+
   const openModal = () => {
-    // Perform calculations and update the state with the data to be displayed in the modal
+    // Calculate the date range
+    const dateRange = calculateDateRange();
+
+    // Perform other calculations as needed
+    // For now, we'll only calculate the date range
 
     setIsModalVisible(true);
     setModalStep(1);
@@ -130,7 +152,11 @@ export default function WageCalculatorScreen() {
       />
 
       <Button title="Calculate Earnings" onPress={openModal} />
-      <EarningsModal isVisible={isModalVisible} closeModal={() => setIsModalVisible(false)} />
+      <EarningsModal
+        isVisible={isModalVisible}
+        dateRange={calculateDateRange()}
+        closeModal={() => setIsModalVisible(false)}
+      />
     </View>
   );
 }

@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, Modal, Button, StyleSheet } from "react-native";
 
-const EarningsModal = ({ isVisible, closeModal }) => {
+const EarningsModal = ({ isVisible, closeModal, dateRange }) => {
   return (
     <Modal transparent={true} visible={isVisible} animationType="slide">
       <View style={styles.modalBackground}>
@@ -11,6 +11,8 @@ const EarningsModal = ({ isVisible, closeModal }) => {
           </View>
           <View style={styles.modalContent}>
             <Text>Modal Content</Text>
+            <Text>{dateRange}</Text>
+
             {/* Add your modal content here */}
           </View>
           <Button title="Mark as paid" />
