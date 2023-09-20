@@ -150,12 +150,23 @@ export default function WageCalculatorScreen() {
           updatedTimePunches[index].tags = ["paid"];
         }
       });
+
       // Update the state with the new time punches
       setTimePunches(updatedTimePunches);
+
+      // Recalculate totalElapsedTime based on the updated selected time punches
+      const newTotalElapsedTime = calculateTotalElapsedTime(updatedTimePunches);
+      setTotalElapsedTime(newTotalElapsedTime);
+
       // Save the updated time punches to AsyncStorage
       await AsyncStorage.setItem("timePunches", JSON.stringify(updatedTimePunches));
+
       // Clear the selected time punches
       setSelectedTimePunches([]);
+
+      // Close the modal
+      setIsModalVisible(false);
+
       alert("Time punches marked as paid successfully.");
     } catch (error) {
       console.error("Error marking time punches as paid:", error);
@@ -164,9 +175,12 @@ export default function WageCalculatorScreen() {
 
   const openModal = () => {
     // Calculate the date range
-    const dateRange = calculateDateRange(selectedTimePunches); // Pass selectedTimePunches here
+    const dateRange = calculateDateRange(selectedTimePunches);
+
+    // Calculate totalElapsedTime based on the selected time punches
     const totalElapsedTime = calculateTotalElapsedTime(selectedTimePunches);
 
+    // Calculate total earnings
     calculateTotalEarnings();
 
     setTotalElapsedTime(totalElapsedTime);
