@@ -5,6 +5,7 @@ import TimePunch from "./TimePunch";
 import EarningsModal from "./EarningsModal";
 
 export default function WageCalculatorScreen() {
+  const [hourlyRateInput, setHourlyRateInput] = useState("");
   const [hourlyRate, setHourlyRate] = useState("");
   const [totalEarnings, setTotalEarnings] = useState("");
   const [isEditingRate, setIsEditingRate] = useState(false);
@@ -17,7 +18,9 @@ export default function WageCalculatorScreen() {
   useEffect(() => {
     // Load the hourly rate from AsyncStorage when the component mounts
     loadHourlyRate();
+  }, []);
 
+  useEffect(() => {
     // Load time punches from AsyncStorage
     loadTimePunches();
 
@@ -27,7 +30,7 @@ export default function WageCalculatorScreen() {
 
     // Calculate total earnings
     const totalEarnings = calculateTotalEarnings(selectedTimePunches);
-  }, [timePunches, hourlyRate, selectedTimePunches]);
+  }, [timePunches, selectedTimePunches]);
 
   // Function to load hourly rate from AsyncStorage
   const loadHourlyRate = async () => {
@@ -35,6 +38,7 @@ export default function WageCalculatorScreen() {
       const savedHourlyRate = await AsyncStorage.getItem("hourlyRate");
       if (savedHourlyRate) {
         setHourlyRate(savedHourlyRate);
+        setHourlyRateInput(savedHourlyRate); // Set input state
       }
     } catch (error) {
       console.error("Error loading hourly rate:", error);
@@ -57,8 +61,9 @@ export default function WageCalculatorScreen() {
   // Function to save the hourly rate
   const saveHourlyRate = async () => {
     try {
-      await AsyncStorage.setItem("hourlyRate", hourlyRate);
+      await AsyncStorage.setItem("hourlyRate", hourlyRateInput); // Use hourlyRateInput instead of hourlyRate
       setIsEditingRate(false); // Exit rate editing mode
+      setHourlyRate(hourlyRateInput); // Update hourlyRate with the input value
       alert("Hourly rate saved successfully.");
     } catch (error) {
       console.error("Error saving hourly rate:", error);
@@ -67,7 +72,9 @@ export default function WageCalculatorScreen() {
 
   // Function to handle rate input changes
   const handleRateInputChange = (text) => {
-    setHourlyRate(text);
+    console.log("Input value changed:", text);
+
+    setHourlyRateInput(text);
   };
 
   // Function to handle rate input submission (e.g., Enter key)
@@ -204,7 +211,7 @@ export default function WageCalculatorScreen() {
         <TextInput
           style={styles.input}
           onChangeText={handleRateInputChange}
-          value={hourlyRate}
+          value={hourlyRateInput}
           keyboardType="numeric"
           returnKeyType="done"
           onSubmitEditing={handleRateInputSubmit}
