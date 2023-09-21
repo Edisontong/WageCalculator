@@ -67,6 +67,7 @@ export default function HomeScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
+      <Button title="Go to Settings" onPress={() => navigation.navigate("Settings")} />
       <Text>{clockedIn ? "You are clocked in." : "You are clocked out."}</Text>
       <Button title={clockedIn ? "Clock Out" : "Clock In"} onPress={handleClockInOut} />
       <Button title="View History" onPress={() => navigation.navigate("History")} />
