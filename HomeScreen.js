@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, Button, StyleSheet } from "react-native";
+import { View, Text, Button, StyleSheet, TouchableOpacity } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { AntDesign } from "@expo/vector-icons"; // Import icons from Expo
 
 export default function HomeScreen({ navigation }) {
   const [clockedIn, setClockedIn] = useState(false);
@@ -67,7 +68,9 @@ export default function HomeScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Button title="Go to Settings" onPress={() => navigation.navigate("Settings")} />
+      <TouchableOpacity style={styles.settingsButton} onPress={() => navigation.navigate("Settings")}>
+        <AntDesign name="setting" size={24} color="black" />
+      </TouchableOpacity>
       <Text>{clockedIn ? "You are clocked in." : "You are clocked out."}</Text>
       <Button title={clockedIn ? "Clock Out" : "Clock In"} onPress={handleClockInOut} />
       <Button title="View History" onPress={() => navigation.navigate("History")} />
@@ -82,5 +85,18 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+  settingsButton: {
+    position: "absolute",
+    top: 16, // Adjust this value to position the button vertically
+    right: 16, // Adjust this value to position the button horizontally
+    zIndex: 1, // Ensure the button appears above other content
+    backgroundColor: "white", // Background color of the button
+    borderRadius: 20, // Border radius for a circular button
+    padding: 10, // Padding for the button
+    elevation: 3, // Add elevation to create a shadow effect (Android)
+    shadowColor: "#000", // Shadow color (iOS)
+    shadowOffset: { width: 0, height: 2 }, // Shadow offset (iOS)
+    shadowOpacity: 0.2, // Shadow opacity (iOS)
+    shadowRadius: 2, // Shadow radius (iOS)
+  },
 });
-``;
