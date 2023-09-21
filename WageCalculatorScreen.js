@@ -21,8 +21,13 @@ export default function WageCalculatorScreen() {
     // Load time punches from AsyncStorage
     loadTimePunches();
 
-    calculateTotalEarnings();
-  }, [totalElapsedTime, hourlyRate]);
+    // Calculate the total elapsed time when timePunches change
+    const newTotalElapsedTime = calculateTotalElapsedTime(timePunches);
+    setTotalElapsedTime(newTotalElapsedTime);
+
+    // Calculate total earnings
+    const totalEarnings = calculateTotalEarnings(selectedTimePunches);
+  }, [timePunches, hourlyRate, selectedTimePunches]);
 
   // Function to load hourly rate from AsyncStorage
   const loadHourlyRate = async () => {
@@ -73,7 +78,7 @@ export default function WageCalculatorScreen() {
   // Function to toggle selection of a TimePunch entry
   const toggleTimePunchSelection = (item) => {
     // Create a copy of the selected time punches array
-    const updatedSelection = selectedTimePunches ? [...selectedTimePunches] : [];
+    const updatedSelection = [...selectedTimePunches];
 
     const selectedIndex = updatedSelection.findIndex((selectedItem) => selectedItem.date === item.date);
 
@@ -90,7 +95,7 @@ export default function WageCalculatorScreen() {
   };
 
   // Function to calculate the date range based on selected time punches
-  const calculateDateRange = (selectedTimePunches) => {
+  const calculateDateRange = () => {
     try {
       if (!selectedTimePunches || selectedTimePunches.length === 0) {
         return "No dates selected";
@@ -112,16 +117,19 @@ export default function WageCalculatorScreen() {
     }
   };
 
-  // Function to calculate the total elapsed time based on selected time punches
-  const calculateTotalElapsedTime = (selectedTimePunches) => {
+  const calculateTotalElapsedTime = () => {
     let totalElapsedTime = 0;
 
-    // Loop through the selected time punches
-    selectedTimePunches.forEach((timePunch) => {
-      if (timePunch.clockInTime && timePunch.clockOutTime) {
+    // Loop through all time punches, but only calculate for selected time punches with the "unpaid" tag
+    timePunches.forEach((timePunch) => {
+      if (
+        selectedTimePunches.some((selectedItem) => selectedItem.date === timePunch.date) &&
+        timePunch.tags.includes("unpaid") // Check if the time punch has the "unpaid" tag
+      ) {
         const startTime = new Date(timePunch.clockInTime).getTime();
         const endTime = new Date(timePunch.clockOutTime).getTime();
         const elapsedTime = endTime - startTime;
+
         totalElapsedTime += elapsedTime;
       }
     });
@@ -130,14 +138,18 @@ export default function WageCalculatorScreen() {
   };
 
   // Function to calculate total earnings
-  const calculateTotalEarnings = () => {
-    if (!hourlyRate) {
-      setTotalEarnings("Hourly rate not set");
-    } else {
-      const totalHoursWorked = totalElapsedTime / (60 * 60 * 1000); // Convert milliseconds to hours
-      const earnings = totalHoursWorked * parseFloat(hourlyRate);
-      setTotalEarnings(`Total Earnings: $${earnings.toFixed(2)}`);
-    }
+  const calculateTotalEarnings = async (selectedTimePunches) => {
+    return new Promise((resolve) => {
+      if (!hourlyRate) {
+        setTotalEarnings("Hourly rate not set");
+        resolve("Hourly rate not set");
+      } else {
+        const totalHoursWorked = totalElapsedTime / (60 * 60 * 1000); // Convert milliseconds to hours
+        const earnings = totalHoursWorked * parseFloat(hourlyRate);
+        setTotalEarnings(`Total Earnings: $${earnings.toFixed(2)}`);
+        resolve(`Total Earnings: $${earnings.toFixed(2)}`);
+      }
+    });
   };
 
   const markTimePunchesAsPaid = async () => {
@@ -154,18 +166,11 @@ export default function WageCalculatorScreen() {
       // Update the state with the new time punches
       setTimePunches(updatedTimePunches);
 
-      // Recalculate totalElapsedTime based on the updated selected time punches
-      const newTotalElapsedTime = calculateTotalElapsedTime(updatedTimePunches);
-      setTotalElapsedTime(newTotalElapsedTime);
-
-      // Save the updated time punches to AsyncStorage
-      await AsyncStorage.setItem("timePunches", JSON.stringify(updatedTimePunches));
-
       // Clear the selected time punches
       setSelectedTimePunches([]);
 
-      // Close the modal
-      setIsModalVisible(false);
+      // Save the updated time punches to AsyncStorage
+      await AsyncStorage.setItem("timePunches", JSON.stringify(updatedTimePunches));
 
       alert("Time punches marked as paid successfully.");
     } catch (error) {
@@ -173,7 +178,7 @@ export default function WageCalculatorScreen() {
     }
   };
 
-  const openModal = () => {
+  const openModal = async () => {
     // Calculate the date range
     const dateRange = calculateDateRange(selectedTimePunches);
 
@@ -181,11 +186,15 @@ export default function WageCalculatorScreen() {
     const totalElapsedTime = calculateTotalElapsedTime(selectedTimePunches);
 
     // Calculate total earnings
-    calculateTotalEarnings();
+    const totalEarnings = await calculateTotalEarnings(selectedTimePunches);
 
-    setTotalElapsedTime(totalElapsedTime);
+    // Set isModalVisible to true first
     setIsModalVisible(true);
     setModalStep(1);
+
+    // Set totalElapsedTime and totalEarnings
+    setTotalElapsedTime(totalElapsedTime);
+    setTotalEarnings(totalEarnings);
   };
 
   return (
@@ -214,10 +223,10 @@ export default function WageCalculatorScreen() {
             item={item}
             onSelect={toggleTimePunchSelection}
             isSelected={selectedTimePunches.some((selectedItem) => selectedItem.date === item.date)}
-            isWageCalculatorScreen={true} // Pass this prop
+            isWageCalculatorScreen={true}
           />
         )}
-        keyExtractor={(item, index) => index.toString()}
+        keyExtractor={(item, index) => item.date}
       />
 
       <Button title="Calculate Earnings" onPress={openModal} />
@@ -248,11 +257,5 @@ const styles = StyleSheet.create({
     borderColor: "#ccc",
     padding: 8,
     marginBottom: 16,
-  },
-  timePunch: {
-    marginBottom: 16,
-    padding: 8,
-    backgroundColor: "#f0f0f0",
-    borderRadius: 8,
   },
 });

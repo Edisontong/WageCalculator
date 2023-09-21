@@ -29,7 +29,6 @@ const EarningsModal = ({
             <Text>{dateRange}</Text>
             <Text>Total Elapsed Time: {formatElapsedTime(totalElapsedTime)}</Text>
             <Text>{totalEarnings}</Text>
-            {/* Add your modal content here */}
           </View>
           <Button title="Mark as paid" onPress={markTimePunchesAsPaid} />
         </View>
